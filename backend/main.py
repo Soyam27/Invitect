@@ -5,12 +5,12 @@ import asyncio
 from concurrent.futures import ThreadPoolExecutor
 import logging
 
-from .utils.firebaseutils import saveHit, fetchHits
-from .utils.recommendation import get_recommended_videos
-from .utils.youtube import extract_video_id, get_comments, get_video_details
-from .utils.spam import detect_spam
-from .utils.sentiment import analyze_comments_batch
-from .utils.gemini import summarize_with_gemini
+from utils.firebaseutils import saveHit, fetchHits
+from utils.recommendation import get_recommended_videos
+from utils.youtube import extract_video_id, get_comments, get_video_details
+from utils.spam import detect_spam
+from utils.sentiment import analyze_comments_batch
+from utils.gemini import summarize_with_gemini
 
 import firebase_admin
 from firebase_admin import auth
