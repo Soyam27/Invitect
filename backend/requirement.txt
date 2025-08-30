@@ -4,6 +4,7 @@ firebase-admin==6.4.0
 python-dotenv==1.0.1
 requests==2.31.0
 pydantic==2.6.3
+pydantic-core==2.16.3 --only-binary=:all:
 google-api-core==2.17.1
 google-auth==2.28.1
 google-cloud-core==2.4.1
