@@ -1,9 +1,12 @@
 import re
 from transformers import pipeline
 
+# Initialize pipeline with truncation and max_length
 spam_classifier = pipeline(
     "text-classification",
-    model="AntiSpamInstitute/spam-detector-bert-MoE-v2.2"
+    model="AntiSpamInstitute/spam-detector-bert-MoE-v2.2",
+    truncation=True,
+    max_length=512
 )
 
 def is_spam_rule_based(comment: str) -> bool:
@@ -24,7 +27,9 @@ def detect_spam(comments: list[str]):
     if not comments:
         return {"spam": 0, "total": 0, "examples": []}
 
-    predictions = spam_classifier(comments, truncation=True)
+    # Ensure truncation and max_length in the call
+    predictions = spam_classifier(comments, truncation=True, max_length=512, padding=True)
+    
     for comment, pred in zip(comments, predictions):
         label = pred["label"].lower()
         score = pred["score"]
@@ -32,4 +37,5 @@ def detect_spam(comments: list[str]):
             spam_count += 1
             if len(spam_examples) < 5:
                 spam_examples.append(comment)
+    
     return {"spam": spam_count, "total": len(comments), "examples": spam_examples}

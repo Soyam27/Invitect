@@ -1,6 +1,9 @@
 "use client";
 import { useState } from "react";
 import { motion } from "framer-motion";
+import ProtectedRoute from "../../components/ProtectedRoute";
+import FloatingGlassMorphNavbar from "../../components/Navbar";
+import { getAuth } from "firebase/auth";
 
 export default function SpamDetection() {
   const [url, setUrl] = useState("");
@@ -11,9 +14,16 @@ export default function SpamDetection() {
     setLoading(true);
     setResult(null);
     try {
-      const res = await fetch("http://127.0.0.1:8000/spamdetection", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+     const auth = getAuth();
+           const user = auth.currentUser;
+           const token = user ? await user.getIdToken() : "";
+     
+           const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL+"/spamdetection"}`, {
+             method: "POST",
+             headers: { 
+               "Content-Type": "application/json",
+               "Authorization": `Bearer ${token}` // Pass Firebase ID token
+             },
         body: JSON.stringify({ url }),
       });
       const data = await res.json();
@@ -26,6 +36,8 @@ export default function SpamDetection() {
   };
 
   return (
+    <ProtectedRoute>
+      <FloatingGlassMorphNavbar/>
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-800 flex flex-col items-center justify-center p-6">
       {/* Title */}
       <motion.h1
@@ -95,5 +107,6 @@ export default function SpamDetection() {
         </motion.div>
       )}
     </div>
+    </ProtectedRoute>
   );
 }

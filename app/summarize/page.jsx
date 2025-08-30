@@ -2,12 +2,13 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import ProtectedRoute from "../../components/ProtectedRoute";
+import FloatingGlassMorphNavbar from "../../components/Navbar";
+import { getAuth } from "firebase/auth";
 
 export default function VideoSummaryPage() {
   const [videoUrl, setVideoUrl] = useState("");
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [loginOpen, setLoginOpen] = useState(false);
 
   const handleSummarize = async (summary_type) => {
     if (!videoUrl) return alert("Please enter a YouTube URL");
@@ -15,11 +16,20 @@ export default function VideoSummaryPage() {
     setResult(null);
 
     try {
-      const res = await fetch("http://127.0.0.1:8000/summarize", {
+      const auth = getAuth();
+      const user = auth.currentUser;
+      const token = user ? await user.getIdToken() : "";
+
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL+"/summarize"}`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}` // Pass Firebase ID token
+        },
         body: JSON.stringify({ url: videoUrl, summary_type }),
       });
+
+      if (!res.ok) throw new Error(`Server error: ${res.status}`);
       const data = await res.json();
       setResult(data);
     } catch (err) {
@@ -31,9 +41,10 @@ export default function VideoSummaryPage() {
   };
 
   return (
-    <ProtectedRoute setLoginOpen={setLoginOpen}>
+    <ProtectedRoute>
+      <FloatingGlassMorphNavbar/>
       <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-800 flex flex-col items-center justify-start px-4 py-10 text-white">
-        <motion.h1 className="text-3xl md:text-5xl font-bold mb-6 text-center drop-shadow-lg">
+        <motion.h1 className="mt-20 text-3xl md:text-5xl font-bold mb-6 text-center drop-shadow-lg">
           🎬 Video Summarizer
         </motion.h1>
 

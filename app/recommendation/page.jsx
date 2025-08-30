@@ -1,6 +1,9 @@
 'use client'
 import { useState } from "react";
 import { motion } from "framer-motion";
+import ProtectedRoute from "../../components/ProtectedRoute";
+import FloatingGlassMorphNavbar from "../../components/Navbar";
+import { getAuth } from "firebase/auth";
 
 export default function RecommendedVideos() {
   const [videoUrl, setVideoUrl] = useState("");
@@ -13,9 +16,16 @@ export default function RecommendedVideos() {
     setRecommendations([]);
 
     try {
-      const res = await fetch("http://127.0.0.1:8000/recommend", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+     const auth = getAuth();
+           const user = auth.currentUser;
+           const token = user ? await user.getIdToken() : "";
+     
+           const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL+"/recommend"}`, {
+             method: "POST",
+             headers: { 
+               "Content-Type": "application/json",
+               "Authorization": `Bearer ${token}` // Pass Firebase ID token
+             },
         body: JSON.stringify({ url: videoUrl, max_results: 6 }),
       });
 
@@ -36,9 +46,11 @@ export default function RecommendedVideos() {
   };
 
   return (
+    <ProtectedRoute>
+      <FloatingGlassMorphNavbar/>
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-800 flex flex-col items-center px-4 py-10 text-white">
       <motion.h1
-        className="text-3xl md:text-5xl font-bold mb-8 text-center"
+        className="mt-20 text-3xl md:text-5xl font-bold mb-8 text-center"
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8 }}
@@ -110,5 +122,6 @@ export default function RecommendedVideos() {
 
       {loading && <p className="mt-6 text-gray-400">Fetching recommendations...</p>}
     </div>
+    </ProtectedRoute>
   );
 }
