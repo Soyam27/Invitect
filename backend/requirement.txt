@@ -1,0 +1,22 @@
+fastapi
+uvicorn[standard]
+pydantic
+python-dotenv
+
+# Firebase
+firebase-admin
+
+# Google Gemini API
+google-generativeai
+
+# Data / ML tools
+numpy
+pandas
+scikit-learn
+
+# For HTTP requests
+httpx
+requests
+
+# For async
+aiohttp
